@@ -73,4 +73,20 @@ jobs:
 
       - name: Deploy to container
         run: docker run -d --name tic-tac-toe-game -p 3000:3000 blazerrt86899/tic-tac-toe:latest
+    
+      - name: Update the kubeconfig
+        run: gcloud container clusters get-credentials ${{ secrets.GKE_CLUSTER_NAME }} --region us-central1 --project ${{ secrets.PROJECT_ID }}
+
+      - name: Deploy to GKE Cluster
+        run: kubectl apply -f deployment-service.yml
+    
+      - name: Notify using Slack Channel
+        if: always()
+        uses: act10ns/slack@v1
+        with:
+            status: ${{ job.status }}
+            steps: ${{ toJson(steps) }}
+            channel: '#project-tic-tac-reporting'
+        env:
+            SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
 
