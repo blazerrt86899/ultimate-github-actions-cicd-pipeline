@@ -4,7 +4,6 @@ on:
   push:
     branches: [main]
 
-
 jobs:
   test-analyse-build:
     name: Build
@@ -35,13 +34,13 @@ jobs:
         run: npm ci
 
       - name: Add Trivy File scan
-        run: trivy fs . > trivy-scan-report.txt
+        run: trivy fs . > trivy-file-scan-report.txt
 
       - name: Upload Trivy Results to Artifact
         uses: actions/upload-artifact@v4
         with:
             name: Trivy Scan Report
-            path: trivy-scan-report.txt
+            path: trivy-file-scan-report.txt
       
       - name: Login Docker
         run: docker login -u  ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
