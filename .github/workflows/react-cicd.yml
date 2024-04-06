@@ -60,3 +60,17 @@ jobs:
         with:
             name: Trivy Image Scan Report
             path: trivy-image-scan-report.txt
+  deploy:
+    runs-on: [gcp-ce]
+    needs: [test-analyse-build]
+    steps:
+
+      - name: Pull Docker Image
+        run: docker pull blazerrt86899/tic-tac-toe:latest
+
+      - name: Trivy Image Scan
+        run: trivy image blazerrt86899/tic-tac-toe:latest > trivy-deploy-image-scan.txt
+
+      - name: Deploy to container
+        run: docker run -d --name tic-tac-toe-game -p 3000:3000 blazerrt86899/tic-tac-toe:latest
+
