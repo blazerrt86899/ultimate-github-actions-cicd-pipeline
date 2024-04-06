@@ -17,9 +17,30 @@ jobs:
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
-      # If you wish to fail your job when the Quality Gate is red, uncomment the
-      # following lines. This would typically be used to fail a deployment.
+
       - uses: sonarsource/sonarqube-quality-gate-action@master
+        with:
+            scanMetadataReportFile: target/sonar/report-task.txt
         timeout-minutes: 5
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+      - name: Cache dependencies
+        id: cache
+        uses: actions/cache@v3
+        with:
+            path: node_modules
+            key: deps-node-modules-${{ hashFiles('**/package-lock.json') }}
+
+      - name: Install Node packages
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: npm ci
+
+      - name: Add Trivy File scan
+        run: trivy fs . > trivy-scan-report.txt
+
+      - name: Upload Trivy Results to Artifact
+        uses: actions/upload-artifact@v4
+        with:
+            name: Trivy Scan Report
+            path: trivy-scan-report.txt
