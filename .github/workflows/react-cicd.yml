@@ -42,3 +42,12 @@ jobs:
         with:
             name: Trivy Scan Report
             path: trivy-scan-report.txt
+      
+      - name: Login Docker
+        run: docker login -u  ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build Docker Image
+        run: docker build -t blazerrt86899/tic-tac-toe:latest .
+
+      - name: Publish Docker Image
+        run: docker push blazerrt86899/tic-tac-toe:latest
