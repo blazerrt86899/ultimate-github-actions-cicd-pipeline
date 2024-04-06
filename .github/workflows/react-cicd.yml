@@ -6,7 +6,7 @@ on:
 
 
 jobs:
-  build:
+  test-analyse-build:
     name: Build
     runs-on: [gcp-ce]
     steps:
@@ -51,3 +51,12 @@ jobs:
 
       - name: Publish Docker Image
         run: docker push blazerrt86899/tic-tac-toe:latest
+
+      - name: Scan Image for Vulnerability
+        run: trivy image blazerrt86899/tic-tac-toe:latest > trivy-image-scan-report.txt
+    
+      - name: Upload Image Scan Report
+        uses: actions/upload-artifact@v4
+        with:
+            name: Trivy Image Scan Report
+            path: trivy-image-scan-report.txt
